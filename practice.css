@@ -1,0 +1,8 @@
+body { font-family: 'Arial', sans-serif; }
+
+h1 { text-shadow: 3px 3px gray;}
+thead { color: blue; }
+
+.important { font-size: 60px; background-color: yellow; }
+
+.important { color: white; background-color: green; }

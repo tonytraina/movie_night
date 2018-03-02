@@ -1,0 +1,23 @@
+<div class="row justify-content-center">
+
+    <% for movie in Movie.all.order("title asc") %>
+
+      <div class="col-sm-2 m-4">
+
+        <a href="/movies/<%= movie.id %>">
+
+        <% if movie.poster_url.blank? %>
+          <% movie.poster_url = "/blank_poster.png" %>
+        <% end %>
+
+        <img src="<%= movie.poster_url %>" class="movie-poster img-fluid">
+        <div class="row mt-2 justify-content-center">
+          <%= link_to "Delete", "/movies/#{movie.id}", method: 'delete', class: 'mr-2 btn btn-secondary' %>
+          <%= link_to "Vote", "#", class: 'btn btn-secondary' %>
+        </div>
+
+      </div>
+
+    <% end %>
+
+</div>

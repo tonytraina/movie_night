@@ -1,0 +1,40 @@
+<h1>Reviews</h1>
+
+<% for review in Review.order('created_at desc') %>
+
+  <% movie = Movie.find_by(id: review.movie_id) %>
+  <% if movie != nil %>
+
+  <div class="row mb-3">
+    <div class="col-sm-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">
+
+            <% 3.times do %>
+              <p>Howdy!</p>
+            <% end %>
+
+            &#9733; &#9733; &#9733; &#9733; &#9733; &#9733;
+            <p>
+              <%#= review.updated_at.strftime("%B %d, %Y %l:%M %P") %>
+              <%= time_ago_in_words(review.updated_at) %> ago.
+            </p>
+
+            <h6 class="card-subtitle mb-2 text-muted">
+              <%= movie.title %>
+            </h6>
+          </h5>
+          <p class="card-text">
+            <%= review.content %>
+          </p>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+  <% end %>
+
+<% end %>
