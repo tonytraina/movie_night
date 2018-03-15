@@ -1,24 +1,27 @@
 <% movie_id = params[:id] %>
 <% movie = Movie.find_by(id: movie_id) %>
-<% director = Director.find_by(id: movie.director_id) %>
-<% review = Review.find_by(movie_id: movie.id) %>
+
 <div class="row">
 
   <div class="col-sm-6">
     <h2>
       <%= movie.title %>
     </h2>
-
-<!-- avg rating -->
-    <p>
-      <% if review != nil %>
-        &#9733; Average Rating:
-        <%= Review.where(movie_id: movie.id).average(:Rating).round(1) %> (of 5)
-      <% end %>
-    </p>
   </div>
 
 </div>
+
+<p>
+<% review = Review.find_by(movie_id: movie.id) %>
+
+<!-- 4: Average movie rating-->
+<strong>
+  <% if review != nil %>
+    Average Rating:
+    <%= Review.where(movie_id: movie.id).average(:Rating).round(1) %> &#9733;
+  <% end %>
+</strong>
+<p>
 
 <div class="row">
 
@@ -45,7 +48,7 @@
     </p>
 
     <div class="row mt-3">
-      <% characters_in_this_movie = Character.where(movie_id: movie.id) %>
+      <% characters_in_this_movie = Character.where(movie_id: movie) %>
       <% characters_in_this_movie.each do |character| %>
 
         <% the_actor = Actor.find_by(id: character.actor_id) %>
@@ -66,62 +69,69 @@
 
 <div class="row mt-5 justify-content-center">
   <div class="col-sm-6">
+    <a href="/reviews/new?movie_id=<%= movie.id %>" class="float-right">
+      <i class="fas fa-pen-square"></i>
+      Write a Review
+    </a>
 
-<!-- add a new review -->
+    <h2>Reviews for <%= movie.title %> </h2>
 
-  <% movie = Movie.find_by(id: params["movie_id"]) %>
-  <h1><i class="fas fa-pen-square"></i>
-    Write a Review</h1>
+    <% review = Review.find_by(movie_id: movie.id) %>
 
-    <%= form_tag "/reviews", class: 'col-sm-12' do %>
-    <input type="hidden" name="movie_id" value="<%= movie_id %>">
+    <!-- 2: Form to add a review -->
 
-      <p>Rating:
-          <select name="rating" class="form-control" required>
-            <option value="">Please Select...</option>
-            <option value="1">&#9733;</option>
-            <option value="2">&#9733; &#9733;</option>
-            <option value="3">&#9733; &#9733; &#9733; </option>
-            <option value="4">&#9733; &#9733; &#9733; &#9733; </option>
-            <option value="5">&#9733; &#9733; &#9733; &#9733; &#9733;</option>
-          </select>
-      </p>
-
-      <p>Your Review:
-        <textarea class="form-control" cols="80" rows="3" name="content">
-        </textarea>
-      </p>
-
-      <button class="btn btn-success">Submit Review</button>
-      or <%= link_to "Cancel", "/movies/#{movie_id}" %>
-    <% end %>
-
-<!-- if there are no reviews-->
-  <% if review == nil %>
-    <p>
-      <center>Be the First to Write a Review!</center>
+    <hr>
+    <center><strong>Add your own review!</strong></center>
     <p>
 
-  <!-- If there are existing reviews -->
-  <% else %>
-    <% for review in Review.where(movie_id: movie.id).order("created_at desc") %>
-      <p>
-        Star Rating:
-          <% review.rating.times do %>
-          &#9733;
-          <%end%>
-      <p>
-        <%= time_ago_in_words(review.updated_at) %> ago.
-      <p>
-        <%= review.content %>
-      <hr>
+      <%= form_tag "/reviews", class: 'col-sm-12' do %>
+
+        <input type="hidden" name="movie_id" value="<%= movie.id %>">
+
+        <p>Rating:
+            <select name="rating" class="form-control" required>
+              <option value="">Please Select...</option>
+              <option value="1">&#9733;</option>
+              <option value="2">&#9733; &#9733;</option>
+              <option value="3">&#9733; &#9733; &#9733; </option>
+              <option value="4">&#9733; &#9733; &#9733; &#9733; </option>
+              <option value="5">&#9733; &#9733; &#9733; &#9733; &#9733;</option>
+            </select>
+        </p>
+
+        <p>Your Review:
+          <textarea class="form-control" cols="40" rows="3" name="content">
+          </textarea>
+        </p>
+
+        <button class="btn btn-success">Submit Review</button>
+        or <%= link_to "Cancel", "/reviews" %>
+      <% end %>
+
+    <hr>
+    <!-- 3: message if there are no reviews -->
+    <% if review == nil %>
+      <h3>
+      <center>Be the first to write a review!</center>
+    </h3>
+    <br>
+    <!-- 1: Display list of reviews -->
+    <% else %>
+      <% for review in Review.where(movie_id: movie.id).order("created_at desc") %>
+        <p>
+          Star Rating:
+            <% review.rating.times do %>
+            &#9733;
+            <%end%>
+        <p>
+          <%= time_ago_in_words(review.updated_at) %> ago.
+        <p>
+          <%= review.content %>
+        <hr>
+      <%end%>
     <%end%>
-  <%end%>
-  <hr>
 
 
-
-
+<p>
 
   </div>
-</div>
