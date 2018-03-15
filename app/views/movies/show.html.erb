@@ -1,8 +1,7 @@
 <% movie_id = params[:id] %>
-<% movie = Movie.find_by(id: params["id"]) %>
+<% movie = Movie.find_by(id: movie_id) %>
 <% director = Director.find_by(id: movie.director_id) %>
-<% review = Review.find_by(id: params["movie_id"]) %>
-
+<% review = Review.find_by(movie_id: movie.id) %>
 <div class="row">
 
   <div class="col-sm-6">
@@ -11,8 +10,12 @@
     </h2>
 
 <!-- avg rating -->
-    <p> Avg. Rating:
-      <%= Review.average('rating').round(1) %></p>
+    <p>
+      <% if review != nil %>
+        &#9733; Average Rating:
+        <%= Review.where(movie_id: movie.id).average(:Rating).round(1) %> (of 5)
+      <% end %>
+    </p>
   </div>
 
 </div>
@@ -64,10 +67,11 @@
 <div class="row mt-5 justify-content-center">
   <div class="col-sm-6">
 
-<!-- this is the form where you can add a new review for the movie -->
-    <% movie = Movie.find_by(id: params["movie_id"]) %>
-<h1><i class="fas fa-pen-square"></i>
-Write a Review</h1>
+<!-- add a new review -->
+
+  <% movie = Movie.find_by(id: params["movie_id"]) %>
+  <h1><i class="fas fa-pen-square"></i>
+    Write a Review</h1>
 
     <%= form_tag "/reviews", class: 'col-sm-12' do %>
     <input type="hidden" name="movie_id" value="<%= movie_id %>">
@@ -89,22 +93,31 @@ Write a Review</h1>
       </p>
 
       <button class="btn btn-success">Submit Review</button>
-      or <%= link_to "Cancel", "/reviews" %>
+      or <%= link_to "Cancel", "/movies/#{movie_id}" %>
     <% end %>
 
-<!-- this is the place where all existing reviews will be displayed -->
-    <br>
-    <h2>Reviews</h2>
+<!-- if there are no reviews-->
+  <% if review == nil %>
+    <p>
+      <center>Be the First to Write a Review!</center>
+    <p>
 
-    <% reviews = Review.where("movie_id = movie_id").order('created_at DESC') %>
-    <!--<% for review in Review.order('created_at DESC') %>-->
-      <!--<% movie = Review.find_by(id: review.movie_id) %>-->
-    <!--<% end %>-->
-    <% for review in reviews %>
-      <p><%= review.content %></p>
-      <p style="font-style:italic"><%= review.created_at.strftime("%B %d, %Y") %></p>
-    <% end %>
-    <hr>
+  <!-- If there are existing reviews -->
+  <% else %>
+    <% for review in Review.where(movie_id: movie.id).order("created_at desc") %>
+      <p>
+        Star Rating:
+          <% review.rating.times do %>
+          &#9733;
+          <%end%>
+      <p>
+        <%= time_ago_in_words(review.updated_at) %> ago.
+      <p>
+        <%= review.content %>
+      <hr>
+    <%end%>
+  <%end%>
+  <hr>
 
 
 
